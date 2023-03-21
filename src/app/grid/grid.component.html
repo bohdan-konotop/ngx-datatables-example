@@ -1,0 +1,102 @@
+<ngx-datatable #table
+               (select)="selectedColumns($event)"
+               (treeAction)="treeAction($event)"
+               [columns]="columns"
+               [footerHeight]="checkboxes.pagination ? 50 : 0"
+               [headerHeight]="60"
+               [id]="checkboxes.styles ? 'grid-datatable' : ''"
+               [limit]="checkboxes.pagination ? 5 : undefined"
+               [messages]="{emptyMessage: 'You can write any message here'}"
+               [reorderable]="checkboxes.colPicking ? true: false"
+               [rowHeight]="checkboxes.pagination ? 100 : 'auto'"
+               [rows]="checkboxes.overlays ? [] : data"
+               [scrollbarH]="true"
+               [selectionType]="selectionType"
+               [swapColumns]="false"
+               class="material"
+               columnMode="force"
+               treeFromRelation="manager"
+               treeToRelation="id">
+
+    <ngx-datatable-row-detail (toggle)="onDetailToggle($event)" [rowHeight]="300">
+        <ng-template let-expanded="expanded" let-row="row" ngx-datatable-row-detail-template>
+            <div style="padding-left:35px; padding-top: 50px;">
+                <ngx-datatable [columns]="treeColumnsExample"
+                               [rows]="treeRowsExample">
+                </ngx-datatable>
+            </div>
+        </ng-template>
+    </ngx-datatable-row-detail>
+
+    <ng-container *ngIf="checkboxes.treeTable">
+        <ngx-datatable-column
+            [canAutoResize]="false"
+            [draggable]="false"
+            [resizeable]="false"
+            [sortable]="false"
+            [width]="50">
+            <ng-template let-expanded="expanded" let-row="row" ngx-datatable-cell-template>
+                <a
+                    (click)="toggleExpandRow(row)"
+                    [class.datatable-icon-down]="expanded"
+                    [class.datatable-icon-right]="!expanded"
+                    href="javascript:void(0)"
+                    title="Expand/Collapse Row"
+                ></a>
+            </ng-template>
+        </ngx-datatable-column>
+    </ng-container>
+
+
+    <ng-container *ngIf="!checkboxes.customHeader">
+        <ngx-datatable-column *ngFor="let column of columns; let i = index;"
+                              [frozenLeft]="column?.frozenLeft"
+                              [frozenRight]="column?.frozenRight"
+                              [isTreeColumn]="column.treeColumn"
+                              [name]="column.name">
+        </ngx-datatable-column>
+    </ng-container>
+
+    <!--    CUSTOM HEADER    -->
+    <ng-container *ngIf="checkboxes.customHeader">
+        <ngx-datatable-column *ngFor="let column of columns; let i = index;"
+                              [frozenLeft]="column?.frozenLeft"
+                              [frozenRight]="column?.frozenRight"
+                              [name]="column.name">
+            <ng-template let-column="column" ngx-datatable-header-template>
+                <strong>{{column.name}}</strong>
+            </ng-template>
+        </ngx-datatable-column>
+    </ng-container>
+
+    <!--    CUSTOM CELL    -->
+    <ngx-datatable-column *ngIf="checkboxes.customCell" name="img">
+        <ng-template let-value="value" ngx-datatable-cell-template>
+            <div>
+                <img [src]="value" style="height: 75px; width: 75px; border-radius: 50%;">
+            </div>
+        </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-footer *ngIf="checkboxes.pagination">
+        <ng-template
+            let-curPage="curPage"
+            let-offset="offset"
+            let-pageSize="pageSize"
+            let-rowCount="rowCount"
+            let-selectedCount="selectedCount"
+            ngx-datatable-footer-template>
+            <datatable-pager
+                (change)="table.onFooterPage($event)"
+                [count]="rowCount"
+                [hidden]="false"
+                [page]="curPage"
+                [size]="pageSize"
+                pagerLeftArrowIcon="pager-left-arrow-icon"
+                pagerNextIcon="pager-next-icon"
+                pagerPreviousIcon="pager-prev-icon"
+                pagerRightArrowIcon="pager-right-arrow-icon">
+            </datatable-pager>
+        </ng-template>
+    </ngx-datatable-footer>
+</ngx-datatable>
